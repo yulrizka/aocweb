@@ -1,0 +1,17 @@
+---
+version: "3"
+
+volumes:
+  postgres_volume:
+
+services:
+  postgres:
+    image: postgres:11.6-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 12345
+      POSTGRES_DB: strawberry_core
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_volume:/var/lib/postgresql/data

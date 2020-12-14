@@ -3,25 +3,29 @@ package aocweb
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"time"
 
+	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-gonic/gin"
-	"github.com/gorilla/sessions"
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/github"
+	"gorm.io/gorm"
 )
 
 type Handler struct {
 	Config       *Config
-	SessionStore *sessions.CookieStore
+	SessionStore cookie.Store
 	Auth         *Auth
+	DB           *gorm.DB
 }
 
 func (h *Handler) Index(c *gin.Context) {
-	c.HTML(http.StatusOK, "index.tmpl", gin.H{
-		"title": "Main website",
-		"user":  h.Auth.User(c),
+	user := h.Auth.User(c)
+	c.HTML(http.StatusOK, "index.gohtml", gin.H{
+		"title": "(unofficial) Advent of Code solutions",
+		"user":  user,
 	})
 }
 
@@ -54,20 +58,44 @@ func (h *Handler) GithubAuthCallback(c *gin.Context) {
 	}
 	defer resp.Body.Close()
 
-	// just use what is necessary
+	//just use what is necessary
 	info := struct {
+		Name  string `json:"name"`
 		Login string `json:"login"`
 	}{}
+	//info := map[string]interface{}{}
 	if err := json.NewDecoder(resp.Body).Decode(&info); err != nil {
 		c.Error(err)
 		return
 	}
-	h.Auth.WriteUser(c, info.Login)
+
+	var u User
+	err = h.DB.Where("github = ?", info.Login).First(&u).Error
+	if errors.Is(err, gorm.ErrRecordNotFound) {
+		u.Name = info.Name
+		u.Github = info.Login
+		if err := h.DB.Create(&u).Error; err != nil {
+			c.Error(err)
+			return
+		}
+	} else if err != nil {
+		c.Error(err)
+		return
+	}
+	h.Auth.WriteUser(c, u)
 
 	c.Redirect(http.StatusTemporaryRedirect, "/")
 }
 
 func (h *Handler) Submit(c *gin.Context) {
+	user := h.Auth.User(c)
+	c.HTML(http.StatusOK, "submit.gohtml", gin.H{
+		"title": "Submit solution",
+		"user":  user,
+	})
+}
+
+func (h *Handler) DoSubmit(c *gin.Context) {
 	user := h.Auth.User(c)
 	_ = user
 }

@@ -1,0 +1,48 @@
+{{define "content"}}
+    <form class="ui form">
+        <div class="field">
+            <label for="title">Title</label>
+            <input type="text" name="title" placeholder="Title of the submission">
+        </div>
+        <div class="field">
+            <label for="language">Language</label>
+            <select class="ui fluid search dropdown" name="language">
+                <option value="golang">Golang</option>
+                <option value="javascript">Javascript</option>
+                <option value="typescript">Typescript</option>
+                <option value="c++">C++</option>
+                <option value="c#">C#</option>
+                <option value="other">Other</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="type1">Submission 1 content type</label>
+            <select class="ui fluid search dropdown" name="type1">
+                <option value="text">text</option>
+                <option value="github">Github link</option>
+                <option value="paste">Paste link</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="solution1">Solution 1 (max 256 character)</label>
+            <textarea name="solution1" rows="5" name="solution1" placeholder="https://github.com/yulrizka/grproxy/blob/master/handler.go"></textarea>
+        </div>
+        <div class="field">
+            <label for="type2">Submission 2 content type</label>
+            <select class="ui fluid search dropdown" name="type2">
+                <option value="text">text</option>
+                <option value="github">Github link</option>
+                <option value="paste">Paste link</option>
+            </select>
+        </div>
+        <div class="field">
+            <label for="solution2">Solution 2 (max 256 character)</label>
+            <textarea rows="5" name="solution2" placeholder="https://topaz.github.io/paste/#abcdef"></textarea>
+        </div>
+        <div class="field">
+            <label for="notes">Notes</label>
+            <textarea rows="5" name="notes" placeholder="https://topaz.github.io/paste/#abcdef"></textarea>
+        </div>
+        <button class="ui primary button" type="submit">Submit</button>
+    </form>
+{{end}}
